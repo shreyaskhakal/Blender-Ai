@@ -305,10 +305,36 @@ generateBtn.addEventListener('click', async () => {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
+      if (data.code === 'INSUFFICIENT_CREDITS') {
+        progressState.textContent = 'Quota Reached';
+        progressState.style.backgroundColor = 'rgba(251, 191, 36, 0.2)';
+        progressState.style.color = 'var(--status-warning)';
+        progressMessage.innerHTML = `
+          <span>Tripo3D account credit balance is 0.</span>
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <a href="https://platform.tripo3d.ai/billing" target="_blank" class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;">
+              Recharge at Tripo3D
+            </a>
+            <button id="loadFallbackBtn" type="button" class="btn btn-primary" style="font-size: 12px; padding: 6px 10px;">
+              Preview Sample 3D Model
+            </button>
+          </div>
+        `;
+
+        document.getElementById('loadFallbackBtn').addEventListener('click', () => {
+          loadGLBModel('/output/sample_cube.glb', true);
+          progressState.textContent = 'Sample Ready';
+          progressState.style.backgroundColor = 'rgba(52, 211, 153, 0.2)';
+          progressState.style.color = 'var(--status-success)';
+        });
+        return;
+      }
       throw new Error(data.error || data.details || 'Failed to generate 3D model');
     }
 
     progressState.textContent = 'Completed';
+    progressState.style.backgroundColor = 'rgba(52, 211, 153, 0.2)';
+    progressState.style.color = 'var(--status-success)';
     progressMessage.textContent = data.message || '3D Model generation successful!';
     
     // Load into Three.js
