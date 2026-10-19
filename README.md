@@ -128,63 +128,57 @@ Blender-Ai/
 
 ---
 
-## 6. Local Development Setup
+## 6. Quick Start & Local Development Setup
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) `>= 20.x LTS`
-- [pnpm](https://pnpm.io/) `>= 9.x`
-- [Docker Engine & Docker Compose](https://www.docker.com/)
-- [Python](https://www.python.org/) `>= 3.10`
-- [Blender](https://www.blender.org/) `3.6 LTS` or `4.x`
+- [Node.js](https://nodejs.org/) `>= 20.x LTS` (Node 24 supported)
+- [npm](https://www.npmjs.com/) (bundled with Node)
+- [Blender](https://www.blender.org/) `3.6 LTS` or `4.x+`
 
-### Setup Instructions
+### Setup & Run
 ```bash
 # 1. Clone repository
 git clone https://github.com/shreyaskhakal/Blender-Ai.git
 cd Blender-Ai
 
-# 2. Copy environment template
-cp .env.example .env
+# 2. Configure Tripo3D API key in .env.local
+cp .env.example .env.local
+# Edit .env.local and paste: TRIPO3D_API_KEY=your_key_here
 
-# 3. Start local backing services (PostgreSQL, Redis, MinIO)
-docker compose up -d postgres redis minio
+# 3. Install dependencies
+npm install
 
-# 4. Install dependencies (Once Stage 1 scaffolding is initialized)
-pnpm install
-
-# 5. Run database migrations
-pnpm --filter @blender-ai/database prisma migrate dev
-
-# 6. Start development servers
-pnpm dev
+# 4. Start the studio server
+npm start
 ```
+
+Open your browser at **`http://localhost:4000`**.
 
 ---
 
 ## 7. Tripo3D API Configuration
 
 To use the live AI 3D generation service:
-1. Create an account on [Tripo3D Platform](https://platform.tripo3d.ai).
+1. Create an account on the [Tripo3D Platform](https://platform.tripo3d.ai).
 2. Generate an API Key at [https://platform.tripo3d.ai/api-keys](https://platform.tripo3d.ai/api-keys).
-3. Set the key in your `.env` file:
+3. Set your key in `.env.local` (excluded from Git):
    ```env
-   TRIPOSR_API_KEY=your_actual_tripo_api_key
-   TRIPO3D_USE_MOCK=false
+   TRIPO3D_API_KEY=your_actual_tripo_api_key
+   PORT=4000
    ```
 
 > [!WARNING]
-> **API Key Protection:** `TRIPOSR_API_KEY` is a backend-only secret. It must never be exposed to the browser, committed to Git, or configured in the Blender add-on. For local testing without spending credits, set `TRIPO3D_USE_MOCK=true`.
+> **API Key Protection:** `TRIPO3D_API_KEY` is a backend-only secret. It must never be exposed to the browser, committed to Git, or configured in the Blender add-on. For local testing without spending credits, mock mode is activated automatically whenever the key is not set or when `TRIPO3D_USE_MOCK=true`.
 
 ---
 
-## 8. Blender Add-on Setup (Stage 6)
+## 8. Importing into Blender
 
-1. Download the `blender_ai_addon.zip` from your running Blender AI web dashboard under **Settings -> Blender Integration**.
-2. Open Blender, navigate to `Edit -> Preferences -> Add-ons -> Install...` and select the `.zip` file.
-3. Enable the **"Blender AI Integration"** checkbox.
-4. Enter your personal **Blender AI API Token** (generated in the web dashboard).
-5. Open the 3D Viewport, press `N` to expand the Sidebar, and click the **Blender AI** tab.
-6. Browse your generated assets and click **"Import into Scene"**.
+1. Generate your 3D asset in the web studio at `http://localhost:4000`.
+2. Open **Blender**.
+3. Switch to the **Scripting** tab at the top workspace header.
+4. Click **+ New** and open or paste `blender_import.py` (or click "Import into Blender (Python)" in the web studio to copy the script).
+5. Click **Run Script (▶)**. The 3D model will automatically download from your local server and appear centered on the ground plane in your active Blender scene!
 
 ---
 

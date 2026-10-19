@@ -1,0 +1,27 @@
+{
+  "name": "blender-ai",
+  "version": "0.1.0",
+  "description": "Generate genuine 3D models from 2D images and import them into Blender.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "keywords": [
+    "blender",
+    "tripo3d",
+    "3d-generation",
+    "gltf",
+    "threejs",
+    "ai"
+  ],
+  "author": "shreyaskhakal",
+  "license": "MIT"
+}

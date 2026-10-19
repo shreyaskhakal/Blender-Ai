@@ -47,6 +47,11 @@ postgres-data/
 redis-data/
 minio-data/
 .minio.sys/
+uploads/*
+!uploads/.gitkeep
+output/*
+!output/.gitkeep
+!output/sample_cube.glb
 
 # Test and coverage artifacts
 coverage/
