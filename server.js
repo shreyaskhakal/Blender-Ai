@@ -28,9 +28,9 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Ensure directories exist
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
-const OUTPUT_DIR = path.join(__dirname, 'output');
+// Ensure directories exist (use /tmp in serverless Vercel environments)
+const UPLOADS_DIR = process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
+const OUTPUT_DIR = process.env.VERCEL ? path.join('/tmp', 'output') : path.join(__dirname, 'output');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 [UPLOADS_DIR, OUTPUT_DIR, PUBLIC_DIR].forEach((dir) => {
@@ -309,6 +309,37 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 });
 
 /**
+ * Task Status Polling Endpoint (for async workflow and serverless support)
+ */
+app.get('/api/tasks/:taskId', async (req, res) => {
+  const { taskId } = req.params;
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return res.status(401).json({ error: 'API key not configured' });
+  }
+
+  try {
+    const pollRes = await fetch(`https://openapi.tripo3d.ai/v3/tasks/${taskId}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`
+      }
+    });
+
+    const pollData = await pollRes.json();
+    if (!pollRes.ok || pollData.code !== 0) {
+      return res.status(pollRes.status || 500).json({
+        error: pollData.message || 'Failed to poll task status',
+        code: pollData.code
+      });
+    }
+
+    res.json(pollData);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to poll task', details: err.message });
+  }
+});
+
+/**
  * File Download Endpoint with Attachment Header
  */
 app.get('/api/download/:filename', (req, res) => {
@@ -322,8 +353,12 @@ app.get('/api/download/:filename', (req, res) => {
   res.download(filePath, filename);
 });
 
-app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`   Blender AI Studio running at http://localhost:${PORT}   `);
-  console.log(`=======================================================`);
-});
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`   Blender AI Studio running at http://localhost:${PORT}   `);
+    console.log(`=======================================================`);
+  });
+}
+
+export default app;

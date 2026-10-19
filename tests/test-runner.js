@@ -101,7 +101,32 @@ async function testServer() {
     console.log(`  \x1b[33m⚠ SKIP:\x1b[0m Server not running on :4000 (${e.message})`);
   }
 
-  // Summary
+  // ------------------------------------------------------------------------------
+  // Test Suite 5: Deployment & Serverless Readiness (Vercel)
+  // ------------------------------------------------------------------------------
+  console.log('\n[Suite 5: Deployment & Serverless Readiness]');
+  const vercelPath = path.join(ROOT_DIR, 'vercel.json');
+  assert(fs.existsSync(vercelPath), 'vercel.json exists in root directory');
+
+  if (fs.existsSync(vercelPath)) {
+    try {
+      const vercelConfig = JSON.parse(fs.readFileSync(vercelPath, 'utf8'));
+      assert(vercelConfig.version === 2, 'vercel.json specifies version 2');
+      assert(Array.isArray(vercelConfig.routes), 'vercel.json defines routing rules');
+    } catch (e) {
+      assert(false, `vercel.json is invalid JSON: ${e.message}`);
+    }
+  }
+
+  const apiIndexPath = path.join(ROOT_DIR, 'api', 'index.js');
+  assert(fs.existsSync(apiIndexPath), 'api/index.js exists for Vercel serverless function');
+
+  const serverJsPath = path.join(ROOT_DIR, 'server.js');
+  if (fs.existsSync(serverJsPath)) {
+    const serverContent = fs.readFileSync(serverJsPath, 'utf8');
+    assert(serverContent.includes('export default app'), 'server.js exports default express app');
+    assert(serverContent.includes('/api/tasks/:taskId'), 'server.js defines async task polling endpoint');
+  }
   console.log('\n======================================================');
   console.log(`  Test Results: ${passedTests} passed, ${failedTests} failed`);
   console.log('======================================================\n');
