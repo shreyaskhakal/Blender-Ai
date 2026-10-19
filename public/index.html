@@ -188,7 +188,24 @@
           <button id="closeModalBtn" class="btn-icon">&times;</button>
         </div>
         <div class="modal-body">
-          <p>You can import the generated <code>.glb</code> model into Blender with 1 click using the Python Script below:</p>
+          <div class="addon-download-banner">
+            <div>
+              <strong>Native Blender Add-on (.zip)</strong>
+              <p>Install once in Blender Preferences to get a dedicated "Blender AI" panel in your 3D Viewport sidebar (N).</p>
+            </div>
+            <a href="/downloads/blender_ai_addon.zip" class="btn btn-primary" download="blender_ai_addon.zip">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download Add-on (.zip)
+            </a>
+          </div>
+
+          <div style="margin: 16px 0; border-top: 1px solid var(--border-subtle);"></div>
+
+          <p>Or run this one-line import helper inside Blender's <strong>Scripting</strong> tab:</p>
           <div class="code-box">
             <div class="code-box-header">
               <span>Blender Scripting Tab</span>
@@ -197,9 +214,9 @@
             <pre><code id="blenderCode">// Script will be generated dynamically</code></pre>
           </div>
           <ol class="modal-steps">
-            <li>In Blender, switch to the <strong>Scripting</strong> workspace at the top.</li>
+            <li>Open Blender and switch to the <strong>Scripting</strong> workspace.</li>
             <li>Click <strong>+ New</strong> to create a new script and paste the code above.</li>
-            <li>Click <strong>Run Script (▶)</strong>. The model will appear in your 3D Viewport at ground level!</li>
+            <li>Click <strong>Run Script (▶)</strong>. The model will appear in your 3D Viewport!</li>
           </ol>
         </div>
       </div>

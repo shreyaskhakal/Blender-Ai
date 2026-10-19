@@ -552,6 +552,31 @@ body {
   padding: 20px;
 }
 
+.addon-download-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.addon-download-banner strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.addon-download-banner p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 0 !important;
+}
+
 .modal-body p {
   font-size: 13px;
   color: var(--text-secondary);
