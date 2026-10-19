@@ -54,9 +54,11 @@ assert(fs.existsSync(addonPath), 'blender_addon/blender_ai/__init__.py exists');
 if (fs.existsSync(addonPath)) {
   const content = fs.readFileSync(addonPath, 'utf8');
   assert(content.includes('bl_info = {'), 'Contains bl_info dictionary');
-  assert(content.includes('"name": "Blender AI Integration"'), 'Contains add-on title');
+  assert(content.includes('Blender AI Integration'), 'Contains add-on title');
   assert(content.includes('bpy.types.AddonPreferences'), 'Contains AddonPreferences implementation');
   assert(content.includes('bpy.ops.import_scene.gltf'), 'Contains glTF scene import operator');
+  assert(content.includes('blender_ai.generate_from_image'), 'Contains v0.2 generate-from-image operator');
+  assert(content.includes('blender_ai.reset_generation'), 'Contains v0.2 reset-generation operator');
 }
 
 const addonZipPath = path.join(ROOT_DIR, 'public', 'downloads', 'blender_ai_addon.zip');

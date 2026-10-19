@@ -4,23 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blender AI — 2D Image to 3D Model Studio</title>
+  <meta name="description" content="Generate genuine AI-powered 3D models from reference images using Tripo3D and import them directly into Blender.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- Three.js, OrbitControls, and GLTFLoader -->
+  <!-- Three.js ecosystem -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
   <div class="app-container">
-    <!-- Studio Header -->
+
+    <!-- ── Studio Header ──────────────────────────────────────────────── -->
     <header class="app-header">
       <div class="brand">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
           </svg>
         </div>
         <div class="brand-text">
@@ -28,200 +32,233 @@
           <span class="tagline">Tripo3D Generative Mesh Studio</span>
         </div>
       </div>
+
       <div class="header-actions">
         <div id="statusBadge" class="status-badge checking">
           <span class="indicator-dot"></span>
-          <span id="statusText">Checking API...</span>
+          <span id="statusText">Connecting...</span>
         </div>
-        <button id="blenderHelpBtn" class="btn btn-secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
-          </svg>
-          Blender Import Guide
+        <button id="blenderHelpBtn" class="btn btn-secondary" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Blender Import
         </button>
       </div>
     </header>
 
-    <!-- Main Workspace Layout -->
+    <!-- ── Main Workspace ─────────────────────────────────────────────── -->
     <main class="workspace">
-      <!-- Left Controls Panel -->
+
+      <!-- ── Left Controls Panel ─────────────────────────────────────── -->
       <aside class="control-panel">
-        <section class="panel-section">
-          <h2>1. Reference Image</h2>
-          <div id="dropzone" class="dropzone">
-            <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" hidden>
+
+        <!-- Reference Image -->
+        <div class="panel-section">
+          <div class="section-header">
+            <span class="section-num">1</span>
+            <span class="section-title">Reference Image</span>
+          </div>
+          <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Upload reference image">
+            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
             <div id="dropzoneContent" class="dropzone-content">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
-              </svg>
-              <p class="drop-text">Drag & drop image here</p>
+              <div class="dropzone-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+              <p class="drop-text">Drop image here</p>
               <span class="drop-hint">or <button type="button" class="btn-link" id="browseBtn">browse file</button></span>
-              <span class="drop-formats">PNG, JPEG, WebP up to 20MB</span>
+              <span class="drop-formats">PNG · JPEG · WebP up to 20 MB</span>
             </div>
             <div id="imagePreviewContainer" class="image-preview-container hidden">
-              <img id="imagePreview" alt="Upload preview">
-              <button id="removeImageBtn" class="btn-icon remove-btn" title="Remove image">&times;</button>
+              <img id="imagePreview" alt="Reference image preview">
+              <button id="removeImageBtn" class="btn-icon remove-btn" title="Remove image" type="button">&times;</button>
               <div class="file-meta">
                 <span id="fileName">image.png</span>
                 <span id="fileSize">0 KB</span>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section class="panel-section">
-          <h2>2. Generation Settings</h2>
+        <!-- Generation Settings -->
+        <div class="panel-section">
+          <div class="section-header">
+            <span class="section-num">2</span>
+            <span class="section-title">Generation Settings</span>
+          </div>
           <div class="form-group">
-            <label for="modelSelect">AI Model Series</label>
+            <label for="modelSelect">AI Model</label>
             <select id="modelSelect" class="form-select">
-              <option value="v3.1-20260211" selected>Flagship v3.1 (High Precision)</option>
-              <option value="P1-20260311">Low-Poly P1 (Clean Topology)</option>
+              <option value="v3.1-20260211">Flagship v3.1 — High Precision</option>
+              <option value="P1-20260311">Low-Poly P1 — Clean Topology</option>
             </select>
           </div>
           <div class="form-group">
             <label for="textureQuality">Texture Quality</label>
             <select id="textureQuality" class="form-select">
-              <option value="standard" selected>Standard (PBR Maps Included)</option>
+              <option value="standard">Standard (PBR Maps)</option>
               <option value="detailed">Detailed (High Resolution)</option>
             </select>
           </div>
-          <button id="generateBtn" class="btn btn-primary btn-generate" disabled>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
+          <button id="generateBtn" class="btn btn-primary btn-generate" disabled type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Generate 3D Asset
           </button>
-        </section>
+        </div>
 
-        <!-- Generation Progress Box -->
-        <section id="progressSection" class="panel-section progress-section hidden">
+        <!-- Generation Progress -->
+        <div id="progressSection" class="panel-section hidden">
           <div class="progress-header">
-            <span class="progress-title">Generating 3D Mesh</span>
+            <span class="progress-title">
+              <span class="spinner" id="progressSpinner"></span>
+              Generating 3D Mesh
+            </span>
             <span id="progressState" class="progress-pill">Processing</span>
           </div>
-          <div class="progress-bar-container">
-            <div id="progressBar" class="progress-bar-fill"></div>
+          <div class="generation-steps">
+            <div class="step-item" id="step1"><span class="step-dot"></span><span>Upload reference image</span></div>
+            <div class="step-item" id="step2"><span class="step-dot"></span><span>Submit reconstruction task</span></div>
+            <div class="step-item" id="step3"><span class="step-dot"></span><span>AI inference &amp; mesh generation</span></div>
+            <div class="step-item" id="step4"><span class="step-dot"></span><span>Download &amp; persist GLB</span></div>
           </div>
-          <p id="progressMessage" class="progress-message">Uploading reference image to Tripo3D...</p>
-        </section>
+          <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar-fill" style="width:8%"></div>
+          </div>
+          <p id="progressMessage" class="progress-message">Initializing Tripo3D connection...</p>
+        </div>
+
+        <!-- Generation History -->
+        <div class="panel-section history-section">
+          <div class="section-header">
+            <span class="section-num">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <span class="section-title">History</span>
+          </div>
+          <div id="historyList" class="history-list">
+            <p class="history-empty">No generations yet</p>
+          </div>
+        </div>
+
       </aside>
 
-      <!-- Center 3D Viewport Canvas -->
+      <!-- ── Center 3D Viewport ──────────────────────────────────────── -->
       <section class="viewport-section">
         <div id="canvasContainer" class="canvas-container">
-          <!-- Viewport Toolbar Overlay -->
+
+          <!-- Toolbar overlay -->
           <div class="viewport-toolbar">
-            <button id="resetCamBtn" class="tool-btn" title="Reset View (Space)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-              </svg>
+            <button id="resetCamBtn" class="tool-btn" title="Reset Camera (Space)" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               Reset
             </button>
-            <button id="wireframeBtn" class="tool-btn" title="Toggle Wireframe (W)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-                <polyline points="2 17 12 22 22 17"/>
-                <polyline points="2 12 12 17 22 12"/>
-              </svg>
+            <button id="wireframeBtn" class="tool-btn" title="Toggle Wireframe (W)" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
               Wireframe
             </button>
-            <button id="gridBtn" class="tool-btn active" title="Toggle Ground Grid (G)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
-              </svg>
+            <button id="gridBtn" class="tool-btn active" title="Toggle Grid (G)" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
               Grid
+            </button>
+            <button id="autoRotateBtn" class="tool-btn" title="Toggle Auto-Rotate (R)" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              Rotate
             </button>
           </div>
 
-          <!-- Empty State Overlay -->
+          <!-- API mode chip top-right -->
+          <div class="viewport-corner">
+            <div id="viewportApiChip" class="api-mode-chip">
+              <span class="dot"></span>
+              <span id="viewportApiMode">Checking…</span>
+            </div>
+          </div>
+
+          <!-- Empty State -->
           <div id="emptyState" class="empty-state">
             <div class="empty-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
                 <line x1="12" y1="22.08" x2="12" y2="12"/>
               </svg>
             </div>
-            <h3>No 3D Model Loaded</h3>
-            <p>Upload a reference image on the left and click "Generate 3D Asset" to see interactive 3D output.</p>
+            <h3>3D Viewport Ready</h3>
+            <p>Upload a reference image and click <strong>Generate 3D Asset</strong> to see your AI-generated model here with real-time orbit controls.</p>
           </div>
 
-          <!-- Interactive WebGL Canvas -->
+          <!-- WebGL Canvas -->
           <canvas id="webglCanvas"></canvas>
 
-          <!-- Model Info HUD -->
+          <!-- Model HUD -->
           <div id="modelHud" class="model-hud hidden">
-            <div class="hud-item"><span class="hud-label">Format:</span> <span class="hud-val">glTF 2.0 Binary (.glb)</span></div>
-            <div class="hud-item"><span class="hud-label">Status:</span> <span id="hudStatus" class="hud-val">Ready</span></div>
+            <div class="hud-item"><span class="hud-label">Format:</span> <span class="hud-val">glTF 2.0 Binary</span></div>
+            <div class="hud-item"><span class="hud-label">Source:</span> <span id="hudStatus" class="hud-val">–</span></div>
+            <div class="hud-item"><span class="hud-label">File:</span> <span id="hudFile" class="hud-val">–</span></div>
           </div>
         </div>
 
-        <!-- Viewport Bottom Actions -->
+        <!-- Viewport Actions Bar -->
         <div id="viewportActions" class="viewport-actions hidden">
-          <a id="downloadModelBtn" class="btn btn-primary" download="model.glb">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download .GLB Model
+          <a id="downloadModelBtn" class="btn btn-secondary" download="model.glb">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download .GLB
           </a>
-          <button id="quickBlenderBtn" class="btn btn-accent">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="16 18 22 12 16 6"/>
-              <polyline points="8 6 2 12 8 18"/>
-            </svg>
-            Import into Blender (Python)
+          <button id="quickBlenderBtn" class="btn btn-accent" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Import into Blender
           </button>
         </div>
       </section>
     </main>
 
-    <!-- Blender Onboarding Modal -->
-    <div id="blenderModal" class="modal-overlay hidden">
+    <!-- ── Blender Import Modal ────────────────────────────────────────── -->
+    <div id="blenderModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="blenderModalTitle">
       <div class="modal-card">
         <div class="modal-header">
-          <h3>Import 3D Asset into Blender</h3>
-          <button id="closeModalBtn" class="btn-icon">&times;</button>
+          <h3 id="blenderModalTitle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:6px;vertical-align:-3px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Import 3D Asset into Blender
+          </h3>
+          <button id="closeModalBtn" class="btn-icon" type="button" aria-label="Close">&times;</button>
         </div>
         <div class="modal-body">
+
+          <!-- Add-on download banner -->
           <div class="addon-download-banner">
             <div>
-              <strong>Native Blender Add-on (.zip)</strong>
-              <p>Install once in Blender Preferences to get a dedicated "Blender AI" panel in your 3D Viewport sidebar (N).</p>
+              <strong>Blender AI Native Add-on (.zip)</strong>
+              <p>Install once via Blender Preferences → Add-ons → Install. Adds a dedicated <strong>Blender AI</strong> panel to your N-panel sidebar with one-click import &amp; live connection testing.</p>
             </div>
-            <a href="/downloads/blender_ai_addon.zip" class="btn btn-primary" download="blender_ai_addon.zip">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download Add-on (.zip)
+            <a href="/downloads/blender_ai_addon.zip" class="btn btn-primary" download="blender_ai_addon.zip" style="white-space:nowrap;flex-shrink:0">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download .zip
             </a>
           </div>
 
-          <div style="margin: 16px 0; border-top: 1px solid var(--border-subtle);"></div>
+          <div class="modal-divider"></div>
 
-          <p>Or run this one-line import helper inside Blender's <strong>Scripting</strong> tab:</p>
+          <p>Or paste this one-liner directly into Blender's <strong>Scripting</strong> workspace to auto-download &amp; import the latest generated model:</p>
           <div class="code-box">
             <div class="code-box-header">
-              <span>Blender Scripting Tab</span>
-              <button id="copyScriptBtn" class="btn-link">Copy Script</button>
+              <span>Blender Scripting Tab — Python</span>
+              <button id="copyScriptBtn" class="btn-link" type="button">Copy Script</button>
             </div>
-            <pre><code id="blenderCode">// Script will be generated dynamically</code></pre>
+            <pre><code id="blenderCode">/* Script loads after model generation */</code></pre>
           </div>
           <ol class="modal-steps">
-            <li>Open Blender and switch to the <strong>Scripting</strong> workspace.</li>
-            <li>Click <strong>+ New</strong> to create a new script and paste the code above.</li>
-            <li>Click <strong>Run Script (▶)</strong>. The model will appear in your 3D Viewport!</li>
+            <li>Open Blender and switch to the <strong>Scripting</strong> workspace (top bar).</li>
+            <li>Click <strong>+ New</strong>, paste the script above, then click <strong>Run Script (▶)</strong>.</li>
+            <li>The 3D model will appear in your viewport, centered on the ground plane.</li>
           </ol>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" aria-live="polite"></div>
+
+  </div><!-- .app-container -->
 
   <script src="app.js"></script>
 </body>
