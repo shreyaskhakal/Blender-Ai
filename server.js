@@ -176,10 +176,13 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 
     // Step 2: Submit Image-to-Model Task
     console.log('[Blender AI] Step 2/3: Submitting 3D reconstruction task...');
+    const rawExt = path.extname(req.file.originalname).replace('.', '').toLowerCase() || 'jpg';
+    const fileFormat = (rawExt === 'jpeg' || rawExt === 'jpg') ? 'jpg' : (rawExt === 'png' ? 'png' : 'webp');
+
     const taskPayload = {
       model: req.body.model || 'v3.1-20260211',
       file: {
-        type: 'image',
+        type: fileFormat,
         file_token: fileToken
       },
       texture: true,
